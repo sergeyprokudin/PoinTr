@@ -1,4 +1,4 @@
 NAME: ShapeNet
-DATA_PATH: data/RPeople/RPeople
+DATA_PATH: data/RPeople
 N_POINTS: 8192
-PC_PATH: data/RPeople/shapenet_pc
+PC_PATH: data/RPeople/clouds
