@@ -8,7 +8,7 @@ scheduler: {
   type: LambdaLR,
   kwargs: {
   decay_step: 21,
-  lr_decay: 0.76,
+  lr_decay: 0.9,
   lowest_decay: 0.02  # min lr = lowest_decay * lr
 }}
 bnmscheduler: {
@@ -19,6 +19,7 @@ bnmscheduler: {
   bn_momentum: 0.9,
   lowest_decay: 0.01
 }}
+
 
 dataset : {
   train : { _base_: cfgs/dataset_configs/RPeople.yaml, 
@@ -31,6 +32,6 @@ model : {
   NAME: PoinTr, num_pred: 6144, num_query: 96, knn_layer: 1, trans_dim: 384}
 total_bs : 8
 step_per_update : 1
-max_epoch : 200
+max_epoch : 1000
 
 consider_metric: CDL2
