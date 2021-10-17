@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import os
+import numpy as np
 import json
 from tools import builder
 from utils import misc, dist_utils
@@ -158,6 +159,16 @@ def run_net(args, config, train_writer=None, val_writer=None):
     train_writer.close()
     val_writer.close()
 
+import trimesh
+
+def save_ply(X_xyz, X_rgb, ply_path):
+  
+  colors = np.asarray(X_rgb*255, dtype='uint8')
+  ply = trimesh.points.PointCloud(vertices=X_xyz, colors=colors)
+  _ = ply.export(ply_path)
+
+  return
+
 def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val_writer, args, config, logger = None):
     print_log(f"[VALIDATION] Start validating epoch {epoch}", logger = logger)
     base_model.eval()  # set model to eval mode
@@ -212,7 +223,8 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 category_metrics[taxonomy_id] = AverageMeter(Metrics.names())
             category_metrics[taxonomy_id].update(_metrics)
 
-            if val_writer is not None and idx % 200 == 0:
+            if val_writer is not None and idx % 10 == 0:
+                input_pc_true = partial.squeeze().detach().cpu().numpy()
                 input_pc = partial.squeeze().detach().cpu().numpy()
                 input_pc = misc.get_ptcloud_img(input_pc)
                 val_writer.add_image('Model%02d/Input'% idx , input_pc, epoch, dataformats='HWC')
@@ -228,7 +240,23 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 gt_ptcloud = gt.squeeze().cpu().numpy()
                 gt_ptcloud_img = misc.get_ptcloud_img(gt_ptcloud)
                 val_writer.add_image('Model%02d/DenseGT' % idx, gt_ptcloud_img, epoch, dataformats='HWC')
-        
+
+                #print(input_pc_true.shape)
+                #print(dense.shape)
+                #print(gt_ptcloud.shape) args.experiment_path
+                #np.savetxt('/content/%05d_epoch_%05d_input.txt' % (idx, epoch), input_pc_true)
+                input_path = os.path.join(args.experiment_path, '%05d_epoch_%05d_input.ply' % (idx, epoch))
+                save_ply(input_pc_true, input_pc_true, input_path)
+                pred_path = os.path.join(args.experiment_path, '%05d_epoch_%05d_pred.ply' % (idx, epoch))
+                save_ply(dense, dense, pred_path)
+                gt_path = os.path.join(args.experiment_path, '%05d_epoch_%05d_gt.ply' % (idx, epoch))
+                save_ply(gt_ptcloud, gt_ptcloud, gt_path)
+
+                #np.savetxt('/content/%05d_epoch_%05d_preds.txt' % (idx, epoch), dense)
+                #save_ply(dense, dense, '/content/%05d_epoch_%05d_pred.ply' )
+                #np.savetxt('/content/%05d_epoch_%05d_gt.txt' % (idx, epoch), gt_ptcloud)
+                #save_ply(gt_ptcloud, gt_ptcloud, '/content/%05d_epoch_%05d_gt.ply' % (idx, epoch))
+
             if (idx+1) % 20 == 0:
                 print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %
                             (idx + 1, n_samples, taxonomy_id, model_id, ['%.4f' % l for l in test_losses.val()], 
@@ -362,8 +390,6 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
                     test_losses.update([sparse_loss_l1.item() * 1000, sparse_loss_l2.item() * 1000, dense_loss_l1.item() * 1000, dense_loss_l2.item() * 1000])
 
                     _metrics = Metrics.get(dense_points ,gt)
-
-                    # test_metrics.update(_metrics)
 
                     if taxonomy_id not in category_metrics:
                         category_metrics[taxonomy_id] = AverageMeter(Metrics.names())
