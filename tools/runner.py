@@ -223,7 +223,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 category_metrics[taxonomy_id] = AverageMeter(Metrics.names())
             category_metrics[taxonomy_id].update(_metrics)
 
-            if val_writer is not None and idx % 10 == 0:
+            if val_writer is not None and idx % 20 == 0:
                 input_pc_true = partial.squeeze().detach().cpu().numpy()
                 input_pc = partial.squeeze().detach().cpu().numpy()
                 input_pc = misc.get_ptcloud_img(input_pc)
@@ -245,14 +245,14 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 #print(dense.shape)
                 #print(gt_ptcloud.shape) args.experiment_path
                 #np.savetxt('/content/%05d_epoch_%05d_input.txt' % (idx, epoch), input_pc_true)
-                logs_path = '/content/gdrive/MyDrive/datasets/cvpr2022/train_logs'
-                if not os.path.exists(logs_path):
-                  os.makedirs(logs_path)
-                input_path = os.path.join(logs_path, '%05d_epoch_%05d_input.ply' % (idx, epoch))
+                #logs_path = '/content/gdrive/MyDrive/datasets/cvpr2022/train_logs'
+                #if not os.path.exists(logs_path):
+                #  os.makedirs(logs_path)
+                input_path = os.path.join(args.experiment_path, '%05d_epoch_%05d_input.ply' % (idx, epoch))
                 save_ply(input_pc_true, input_pc_true, input_path)
-                pred_path = os.path.join(logs_path, '%05d_epoch_%05d_pred.ply' % (idx, epoch))
+                pred_path = os.path.join(args.experiment_path, '%05d_epoch_%05d_pred.ply' % (idx, epoch))
                 save_ply(dense, dense, pred_path)
-                gt_path = os.path.join(logs_path, '%05d_epoch_%05d_gt.ply' % (idx, epoch))
+                gt_path = os.path.join(args.experiment_path, '%05d_epoch_%05d_gt.ply' % (idx, epoch))
                 save_ply(gt_ptcloud, gt_ptcloud, gt_path)
 
                 #np.savetxt('/content/%05d_epoch_%05d_preds.txt' % (idx, epoch), dense)
