@@ -46,7 +46,12 @@ def get_args():
         '--mode', 
         choices=['easy', 'median', 'hard', None],
         default=None,
-        help = 'difficulty mode for shapenet')        
+        help = 'difficulty mode for shapenet')   
+
+    parser.add_argument('--experiment_path', type = str,  
+                        default='./experiments', 
+                        help = 'reload used ckpt path')
+         
     args = parser.parse_args()
 
     if args.test and args.resume:
@@ -69,10 +74,6 @@ def get_args():
     if args.mode is not None:
         args.exp_name = args.exp_name + '_' +args.mode
         
-    parser.add_argument('--experiment_path', type = str, 
-                        default=os.path.join('./experiments', Path(args.config).stem, Path(args.config).parent.stem, args.exp_name), 
-                        help = 'reload used ckpt path')
-    
     args.tfboard_path = os.path.join(args.experiment_path, Path(args.config).stem, Path(args.config).parent.stem,'TFBoard' ,args.exp_name)
     args.log_name = Path(args.config).stem
     create_experiment_dir(args)
