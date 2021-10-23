@@ -1,0 +1,4 @@
+NAME: ShapeNet
+DATA_PATH: /content/gdrive/MyDrive/datasets/cvpr2022/humbi_pointr
+N_POINTS: 8192
+PC_PATH: /content/gdrive/MyDrive/datasets/cvpr2022/humbi_pointr/clouds
