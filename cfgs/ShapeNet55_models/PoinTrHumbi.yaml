@@ -21,11 +21,11 @@ bnmscheduler: {
 }}
 
 dataset : {
-  train : { _base_: cfgs/dataset_configs/PCNCars.yaml, 
+  train : { _base_: cfgs/dataset_configs/HUMBI.yaml, 
             others: {subset: 'train'}},
-  val : { _base_: cfgs/dataset_configs/PCNCars.yaml, 
+  val : { _base_: cfgs/dataset_configs/HUMBI.yaml, 
             others: {subset: 'test'}},
-  test : { _base_: cfgs/dataset_configs/KITTI.yaml, 
+  test : { _base_: cfgs/dataset_configs/HUMBI.yaml, 
             others: {subset: 'test'}}}
 
 model : {
